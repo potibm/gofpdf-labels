@@ -1,0 +1,23 @@
+# .golangci.yml
+version: "2"
+
+#run:
+#  timeout: 5m
+#  tests: true
+
+linters:
+  default: "fast"
+  disable:
+    - depguard
+  exclusions:
+    rules:
+      - path: formats.go
+        linters:
+          - mnd
+      - path: labels_test.go
+        linters:
+          - testpackage
+
+formatters:
+  enable:
+    - gofmt
