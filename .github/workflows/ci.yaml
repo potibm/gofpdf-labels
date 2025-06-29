@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.24"
+
+      - name: Install golangci-lint
+        uses: golangci/golangci-lint-action@v8
+        with:
+          version: latest
+
+      - name: Run golangci-lint
+        run: golangci-lint run
+
+      - name: Run tests with coverage
+        run: |
+          go test -v -race -coverprofile=coverage.txt ./...
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Check go mod tidy
+        run: |
+          go mod tidy
+          git diff --exit-code || (echo "Run 'go mod tidy'!" && exit 1)
+
+      - name: Install Prettier
+        run: npm install -g prettier
+
+      - name: Check YAML format with Prettier
+        run: prettier --check "**/*.yaml" "**/*.md"
+
+      - name: Lint GitHub Actions workflows
+        uses: raven-actions/actionlint@v1

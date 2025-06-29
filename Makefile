@@ -29,4 +29,13 @@ lint:
 tidy:
 	go mod tidy
 
-.PHONY: all test fmt vet lint tidy coverage
+lint-actions:
+	actionlint
+
+prettier:
+	prettier --write "**/*.yaml" "**/*.md"
+
+# Run all linters together
+lint-all: lint-go lint-actions prettier
+
+.PHONY:lint lint-go lint-actions prettier lint-all test tidy coverage
